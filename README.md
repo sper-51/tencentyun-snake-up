@@ -4,6 +4,13 @@
 
 使用 Python 编写的自动化抢购脚本，支持并发抢购腾讯云轻量应用服务器。
 
+## 运行指令
+
+```powershell
+py -3.13 get_cookies.py
+py -3.13 snap_up_server.py
+```
+
 ![Tencent Cloud](image.png)
 
 ## 功能特点
@@ -24,14 +31,14 @@
 ### 1. 安装依赖
 
 ```bash
-pip install playwright requests
-playwright install chromium
+py -3.13 -m pip install playwright requests
+py -3.13 -m playwright install chromium
 ```
 
 ### 2. 获取登录 Cookie
 
-```bash
-python get_cookies.py
+```powershell
+py -3.13 get_cookies.py
 ```
 
 运行后会自动打开浏览器，点击二维码扫码登录腾讯云。登录成功后 Cookie 会自动保存到 `cookies.json` 文件。
@@ -40,34 +47,24 @@ python get_cookies.py
 
 ### 配置参数
 
-编辑 `snap_up_server.py` 文件：
+脚本启动时会自动读取活动页配置，匹配目标商品“轻量 4核4G3M”，并同步当前场次的 `activity_id`、`act_id`、`business_id` 和下单参数。
 
-1. **设置秒杀时间**（第 197 行）：
-
-```python
-SECKILL_TIME_STR = "2026-02-12 15:00:00"  # 格式：年-月-日 时:分:秒
-```
-
-2. **设置抢购地域**（第 199 行）：
+如需调整地域优先级，可编辑 `snap_up_server.py` 中的：
 
 ```python
 region_ids = [1, 4, 8]  # 1=华北，4=华东，8=华南
 ```
 
-3. **更新 CSRF Token**（第 36 行）：
+**CSRF Token**：
 
-```
-1. 打开浏览器开发者工具 (F12)
-2. 切换到 Network 标签
-3. 点击任意一个 cloud.tencent.com 的请求
-4. 查看 Request Headers 中的 x-csrf-token
-5. 将值更新到代码中
-```
+脚本会自动从 `cookies.json` 里读取 `skey` 并计算 `x-csrf-token`，不需要手工更新。若提示 `CSRF-ERROR`，先重新运行 `get_cookies.py` 登录一次，再执行主脚本。
+
+秒杀时间现在会自动选择当天最接近的 `10:00` 或 `15:00` 时间点；如果已经超过当前时间点 5 分钟，则自动切到下一个时间点。
 
 ### 运行秒杀
 
-```bash
-python snap_up_server.py
+```powershell
+py -3.13 snap_up_server.py
 ```
 
 脚本会自动：
